@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">To Do</string>
+    <string name="my_to_do_list">My To-Do List</string>
+    <string name="button_text">Click Me</string>
+</resources>

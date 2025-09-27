@@ -25,6 +25,16 @@
             android:textColorHint="#EEEEEE"/>
 
         <Button
+            android:id="@+id/btnPickDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pick Date"
+            android:layout_marginStart="8dp"
+            android:background="@color/colorAccent"
+            android:textColor="#FFFFFF"/>
+
+
+        <Button
             android:id="@+id/btnAdd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

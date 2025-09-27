@@ -19,6 +19,7 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
     private static final String COLUMN_ID = "id";
     private static final String COLUMN_TITLE = "title";
     private static final String COLUMN_DONE = "done";
+    private static final String COLUMN_DATE = "date";
 
     public TaskDatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -29,7 +30,8 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
         String CREATE_TABLE = "CREATE TABLE " + TABLE_TASKS + "("
                 + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + COLUMN_TITLE + " TEXT,"
-                + COLUMN_DONE + " INTEGER)";
+                + COLUMN_DONE + " INTEGER,"
+                + COLUMN_DATE + " TEXT)";
         db.execSQL(CREATE_TABLE);
     }
 
@@ -45,6 +47,7 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, task.getTitle());
         values.put(COLUMN_DONE, task.isDone() ? 1 : 0);
+        values.put(COLUMN_DATE, task.getDate());
         long id = db.insert(TABLE_TASKS, null, values);
         db.close();
         return id;
@@ -58,11 +61,12 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
                 String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
                 boolean isDone = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_DONE)) == 1;
-                Task task = new Task(title);
-                task.setDone(isDone);
-                tasks.add(task);
+                String date = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DATE));
+
+                tasks.add(new Task(id, title, isDone, date));
             } while (cursor.moveToNext());
         }
         cursor.close();
@@ -71,19 +75,29 @@ public class TaskDatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Update Task
-    public void updateTask(Task task, String oldTitle) {
+    public void updateTask(Task task) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_TITLE, task.getTitle());
         values.put(COLUMN_DONE, task.isDone() ? 1 : 0);
-        db.update(TABLE_TASKS, values, COLUMN_TITLE + "=?", new String[]{oldTitle});
+        values.put(COLUMN_DATE, task.getDate());
+
+        // Update task by ID instead of title
+        db.update(TABLE_TASKS, values, COLUMN_ID + "=?", new String[]{String.valueOf(task.getId())});
         db.close();
     }
 
     // Delete Task
-    public void deleteTask(String title) {
+//    public void deleteTask(String title) {
+//        SQLiteDatabase db = this.getWritableDatabase();
+//        db.delete(TABLE_TASKS, COLUMN_TITLE + "=?", new String[]{title});
+//        db.close();
+//    }
+
+    // Delete by ID (recommended)
+    public void deleteTask(int id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TASKS, COLUMN_TITLE + "=?", new String[]{title});
+        db.delete(TABLE_TASKS, COLUMN_ID + "=?", new String[]{String.valueOf(id)});
         db.close();
     }
 

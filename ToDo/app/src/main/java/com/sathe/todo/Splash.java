@@ -15,7 +15,7 @@ import androidx.core.view.WindowInsetsCompat;
 public class Splash extends AppCompatActivity {
 
     private TextView splashText;
-    private String massage="Welcome To To Do System";
+    private String massage=" This is the first step to organizing your day !";
     private int index=0;
     private long delay=150;//delay in ms per charecter
 

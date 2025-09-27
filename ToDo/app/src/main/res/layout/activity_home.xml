@@ -1,50 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/background_gradient">
 
-    <!-- App Title -->
-    <TextView
-        android:id="@+id/appTitle"
-        android:layout_width="0dp"
+    <!-- Task Input -->
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/my_to_do_list"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:padding="16dp"
-        android:gravity="center"
-        android:textColor="@android:color/black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:orientation="horizontal"
+        android:padding="10dp">
 
-    <!-- RecyclerView -->
+        <EditText
+            android:id="@+id/etTask"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:hint="Enter task"
+            android:background="@drawable/rounded_edittext"
+            android:padding="12dp"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#EEEEEE"/>
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add"
+            android:textColor="#fff"
+            android:background="@color/colorPrimary"
+            android:layout_marginStart="10dp"/>
+    </LinearLayout>
+
+    <!-- Task List -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewTasks"
-        android:layout_width="0dp"
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/appTitle"
-        app:layout_constraintBottom_toTopOf="@id/fabAddTask"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Floating Action Button -->
-    <Button
-        android:id="@+id/fabAddTask"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_input_add"
-        app:backgroundTint="@color/purple_500"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/button_text"
-        android:foreground="@color/black"/>
-
-
-
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"/>
+</LinearLayout>

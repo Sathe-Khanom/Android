@@ -3,6 +3,8 @@ package com.sathe.todo;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.InputType;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,110 +24,92 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import org.json.JSONArray;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Home extends AppCompatActivity {
 
+    private EditText etTask;
+    private Button btnAdd;
     private RecyclerView recyclerView;
-    private TaskAdapter taskAdapter;
-    private ArrayList<String> taskList;
-//    private FloatingActionButton fabAddTask;
 
-    private Button fabAddTask;
-
-    private static final String TASKS_KEY = "tasks_key";
+    private List<Task> taskList;
+    private TaskAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        recyclerView = findViewById(R.id.recyclerViewTasks);
-        fabAddTask = findViewById(R.id.fabAddTask);
+        etTask = findViewById(R.id.etTask);
+        btnAdd = findViewById(R.id.btnAdd);
+        recyclerView = findViewById(R.id.recyclerView);
 
-        loadTasks();
-
-//        taskList = new ArrayList<>();
-//        taskList.add("Buy groceries");
-//        taskList.add("Complete homework");
-//        taskList.add("Call John");
-
-        taskAdapter = new TaskAdapter(taskList, new TaskAdapter.OnItemClickListener() {
+        taskList = new ArrayList<>();
+        adapter = new TaskAdapter(taskList, this, new TaskAdapter.TaskActionListener() {
             @Override
-            public void onItemClick(int position, String currentTask) {
-                showEditDialog(position, currentTask);
+            public void onEdit(int position) {
+                showEditDialog(position);
+            }
+
+            @Override
+            public void onDelete(int position) {
+                taskList.remove(position);
+                adapter.notifyItemRemoved(position);
+            }
+
+            @Override
+            public void onChecked(int position, boolean isChecked) {
+                taskList.get(position).setDone(isChecked);
             }
         });
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(taskAdapter);
+        recyclerView.setAdapter(adapter);
 
-        fabAddTask.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String newTask = "New Task " + (taskList.size() + 1);
-                taskList.add(newTask);
-                taskAdapter.notifyItemInserted(taskList.size() - 1);
-                Toast.makeText(Home.this, "Task Added", Toast.LENGTH_SHORT).show();
+        btnAdd.setOnClickListener(v -> {
+            String taskTitle = etTask.getText().toString().trim();
+            if (!taskTitle.isEmpty()) {
+                taskList.add(new Task(taskTitle));
+                adapter.notifyItemInserted(taskList.size() - 1);
+                etTask.setText("");
             }
         });
     }
 
-    // Method to show edit dialog
-    public void showEditDialog(int position, String currentTask) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit Task");
+    private void showEditDialog(int position) {
+        Task task = taskList.get(position);
 
-        final EditText input = new EditText(this);
-        input.setText(currentTask);
-        builder.setView(input);
+        // Inflate custom layout
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.dialog_edit_task, null);
 
-        builder.setPositiveButton("Save", (dialog, which) -> {
-            String updatedTask = input.getText().toString().trim();
-            if (!updatedTask.isEmpty()) {
-                taskList.set(position, updatedTask);
-                taskAdapter.notifyItemChanged(position);
-                saveTasks();
-                Toast.makeText(Home.this, "Task updated", Toast.LENGTH_SHORT).show();
+        EditText editTaskInput = dialogView.findViewById(R.id.editTaskInput);
+        Button btnUpdate = dialogView.findViewById(R.id.btnUpdateTask);
+
+        // Set current task title
+        editTaskInput.setText(task.getTitle());
+
+        // Build the dialog
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        // Handle Update button click
+        btnUpdate.setOnClickListener(v -> {
+            String updatedTitle = editTaskInput.getText().toString().trim();
+            if (!updatedTitle.isEmpty()) {
+                task.setTitle(updatedTitle);
+                adapter.notifyItemChanged(position);
+                dialog.dismiss();
             } else {
-                Toast.makeText(Home.this, "Task cannot be empty", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Home.this, "Task title cannot be empty", Toast.LENGTH_SHORT).show();
             }
         });
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-
-        builder.show();
-
-        // Save task list to SharedPreferences
-        public void saveTasks() {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            SharedPreferences.Editor editor = prefs.edit();
-
-            JSONArray jsonArray = new JSONArray();
-            for (String task : taskList) {
-                jsonArray.put(task);
-            };
-
-            editor.putString(TASKS_KEY, jsonArray.toString());
-            editor.apply();
-        }
-
-        // Load task list from SharedPreferences
-        public void loadTasks() {
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-            String tasksJson = prefs.getString(TASKS_KEY, null);
-
-            taskList = new ArrayList<>();
-            if (tasksJson != null) {
-                try {
-                    JSONArray jsonArray = new JSONArray(tasksJson);
-                    for (int i = 0; i < jsonArray.length(); i++) {
-                        taskList.add(jsonArray.getString(i));
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        };
+        // Show the dialog
+        dialog.show();
     }
+
 
 
 }

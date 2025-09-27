@@ -1,16 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:elevation="4dp"
-    android:padding="16dp">
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/rounded_task_item">
 
-    <TextView
-        android:id="@+id/textViewTask"
+    <CheckBox
+        android:id="@+id/cbTask"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Sample Task"
+        android:textColor="#FFFFFF"/>
+
+    <ImageButton
+        android:id="@+id/btnEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sample Task"
-        android:textSize="18sp"/>
-</androidx.cardview.widget.CardView>
+        android:src="@android:drawable/ic_menu_edit"
+        android:background="@android:color/transparent"
+        android:contentDescription="Edit"/>
+
+    <ImageButton
+        android:id="@+id/btnDelete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@android:drawable/ic_menu_delete"
+        android:background="@android:color/transparent"
+        android:contentDescription="Delete"/>
+</LinearLayout>

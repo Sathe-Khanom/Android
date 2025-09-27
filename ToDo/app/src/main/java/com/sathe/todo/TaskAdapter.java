@@ -1,9 +1,11 @@
 package com.sathe.todo;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.CheckBox;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -11,54 +13,67 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder> {
+        private List<Task> taskList;
+        private Context context;
 
-    private List<String> taskList;
-    private OnItemClickListener listener;
-
-    public interface OnItemClickListener {
-        void onItemClick(int position, String currentTask);
-    }
-
-    public TaskAdapter(List<String> taskList, OnItemClickListener listener) {
-        this.taskList = taskList;
-        this.listener = listener;
-    }
-
-    public static class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView taskTextView;
-
-        public TaskViewHolder(View itemView, OnItemClickListener listener, List<String> taskList) {
-            super(itemView);
-            taskTextView = itemView.findViewById(R.id.textViewTask);
-
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    int position = getAdapterPosition();
-                    if (listener != null && position != RecyclerView.NO_POSITION) {
-                        listener.onItemClick(position, taskList.get(position));
-                    }
-                }
-            });
+        public interface TaskActionListener {
+            void onEdit(int position);
+            void onDelete(int position);
+            void onChecked(int position, boolean isChecked);
         }
-    }
 
-    @NonNull
-    @Override
-    public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_task, parent, false);
-        return new TaskViewHolder(itemView, listener, taskList);
-    }
+        private TaskActionListener listener;
 
-    @Override
-    public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
-        String task = taskList.get(position);
-        holder.taskTextView.setText(task);
-    }
+        public TaskAdapter(List<Task> taskList, Context context, TaskActionListener listener) {
+            this.taskList = taskList;
+            this.context = context;
+            this.listener = listener;
+        }
 
-    @Override
-    public int getItemCount() {
-        return taskList.size();
-    }
+        public static class TaskViewHolder extends RecyclerView.ViewHolder {
+            CheckBox cbTask;
+            ImageButton btnEdit, btnDelete;
+
+            public TaskViewHolder(View itemView) {
+                super(itemView);
+                cbTask = itemView.findViewById(R.id.cbTask);
+                btnEdit = itemView.findViewById(R.id.btnEdit);
+                btnDelete = itemView.findViewById(R.id.btnDelete);
+            }
+        }
+
+        @NonNull
+        @Override
+        public TaskViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(context).inflate(R.layout.item_task, parent, false);
+            return new TaskViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
+            Task task = taskList.get(position);
+
+            // Clear previous listener to avoid triggering during recycling
+            holder.cbTask.setOnCheckedChangeListener(null);
+
+            // Set task title and checkbox state
+            holder.cbTask.setText(task.getTitle());
+            holder.cbTask.setChecked(task.isDone());
+
+            // Re-attach checkbox listener
+            holder.cbTask.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                listener.onChecked(position, isChecked);
+            });
+
+            // Edit button click
+            holder.btnEdit.setOnClickListener(v -> listener.onEdit(position));
+
+            // Delete button click
+            holder.btnDelete.setOnClickListener(v -> listener.onDelete(position));
+        }
+
+        @Override
+        public int getItemCount() {
+            return taskList.size();
+        }
 }

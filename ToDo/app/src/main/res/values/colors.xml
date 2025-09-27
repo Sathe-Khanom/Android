@@ -8,5 +8,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="purple_500">#6200EE</color>
-
+    <color name="colorPrimary">#FF6F61</color> <!-- Pink -->
+    <color name="colorAccent">#4CAF50</color> <!-- Green -->
+    <color name="colorBackground">#FF9A8B</color> <!-- Light Pink -->
 </resources>

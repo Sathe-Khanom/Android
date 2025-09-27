@@ -34,6 +34,9 @@ public class Home extends AppCompatActivity {
 
     private List<Task> taskList;
     private TaskAdapter adapter;
+    private TaskDatabaseHelper dbHelper;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +47,11 @@ public class Home extends AppCompatActivity {
         btnAdd = findViewById(R.id.btnAdd);
         recyclerView = findViewById(R.id.recyclerView);
 
-        taskList = new ArrayList<>();
+        dbHelper = new TaskDatabaseHelper(this);
+
+        // Load saved tasks
+        taskList = dbHelper.getAllTasks();
+
         adapter = new TaskAdapter(taskList, this, new TaskAdapter.TaskActionListener() {
             @Override
             public void onEdit(int position) {
@@ -53,6 +60,7 @@ public class Home extends AppCompatActivity {
 
             @Override
             public void onDelete(int position) {
+                dbHelper.deleteTask(taskList.get(position).getTitle());
                 taskList.remove(position);
                 adapter.notifyItemRemoved(position);
             }
@@ -60,6 +68,7 @@ public class Home extends AppCompatActivity {
             @Override
             public void onChecked(int position, boolean isChecked) {
                 taskList.get(position).setDone(isChecked);
+                dbHelper.updateTask(taskList.get(position), taskList.get(position).getTitle());
             }
         });
 
@@ -69,12 +78,16 @@ public class Home extends AppCompatActivity {
         btnAdd.setOnClickListener(v -> {
             String taskTitle = etTask.getText().toString().trim();
             if (!taskTitle.isEmpty()) {
-                taskList.add(new Task(taskTitle));
+                Task task = new Task(taskTitle);
+                dbHelper.addTask(task);
+                taskList.add(task);
                 adapter.notifyItemInserted(taskList.size() - 1);
                 etTask.setText("");
             }
         });
     }
+
+
 
     private void showEditDialog(int position) {
         Task task = taskList.get(position);
@@ -98,7 +111,15 @@ public class Home extends AppCompatActivity {
         btnUpdate.setOnClickListener(v -> {
             String updatedTitle = editTaskInput.getText().toString().trim();
             if (!updatedTitle.isEmpty()) {
+                String oldTitle = task.getTitle();  // keep old title for DB update
+
+                // Update in object
                 task.setTitle(updatedTitle);
+
+                // Update in database
+                dbHelper.updateTask(task, oldTitle);
+
+                // Update UI
                 adapter.notifyItemChanged(position);
                 dialog.dismiss();
             } else {
@@ -109,7 +130,6 @@ public class Home extends AppCompatActivity {
         // Show the dialog
         dialog.show();
     }
-
 
 
 }

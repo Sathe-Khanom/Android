@@ -30,7 +30,7 @@
             android:layout_height="wrap_content"
             android:text="Pick Date"
             android:layout_marginStart="8dp"
-            android:background="@color/colorAccent"
+            android:background="@drawable/rounded_datetext"
             android:textColor="#FFFFFF"/>
 
 
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:text="Add"
             android:textColor="#fff"
-            android:background="@color/colorPrimary"
+            android:background="@drawable/rounded_addtext"
             android:layout_marginStart="10dp"/>
     </LinearLayout>
 
